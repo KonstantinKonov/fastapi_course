@@ -46,8 +46,8 @@ hotels = [
 def get_items(
     id: int | None = Query(None, description='id'), 
     title: str | None = Query(None, description='title'), 
-    #page: int | None = Query(1, description='startpage'), 
-    #per_page: int | None = Query(3, description='per page')
+    page: int | None = Query(1, description='startpage'), 
+    per_page: int | None = Query(3, description='per page')
     ):
 
     hotels_filtered = []
@@ -58,7 +58,7 @@ def get_items(
             continue
         hotels_filtered.append(hotel)
         
-    #hotels_filtered = hotels_filtered[(page-1) * per_page : page*per_page]
+    hotels_filtered = hotels_filtered[(page-1) * per_page : page*per_page]
     return hotels_filtered
 
 
