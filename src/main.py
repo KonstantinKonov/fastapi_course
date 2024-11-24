@@ -1,9 +1,18 @@
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_swagger_ui_html
 import uvicorn
-from hotels import router as router_hotels
+
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).parent.parent))
+
+from src.api.hotels import router as router_hotels
+
+from src.database import *
 
 app = FastAPI(docs_url=None)
+
 app.include_router(router_hotels)
 
 @app.get("/docs", include_in_schema=False)
@@ -16,5 +25,6 @@ async def custom_swagger_ui_html():
         swagger_css_url="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css",
     )
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", reload=True)
+if __name__ == '__main__':
+    uvicorn.run('main:app', reload=True)
+
