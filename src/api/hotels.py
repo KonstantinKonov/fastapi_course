@@ -5,6 +5,8 @@ from src.database import async_session_maker
 from src.models.hotels import HotelsOrm
 from src.models.rooms import RoomsOrm
 from sqlalchemy import insert, select
+from repositories.hotels import HotelsRepository
+
 
 router = APIRouter(prefix='/hotels', tags=['Hotels'])
 
@@ -16,26 +18,14 @@ async def get_hotels(
     title: str | None = Query(None, description='Hotel Title'),
 ):
     per_page = pagination.per_page or 5
-    limit = per_page
-    offset = per_page * (per_page - 1)
     async with async_session_maker() as session:
-        query = select(HotelsOrm)
-        if location is not None:
-            query = query.filter(HotelsOrm.location.ilike(f'%{location}%'))
-        if title is not None:
-            query = query.filter_by(title=title). \
-            limit(limit). \
-            offset(offset)
-        res = await session.execute(query)
-        hotels = res.scalars().all()
-        return hotels
-
-    #if pagination.page and pagination.per_page:
-        #start = pagination.per_page * (pagination.page - 1)
-        #end = pagination.per_page * pagination.page
-        #return hotels_filtered[start : end]
-    #return hotels_filtered
-
+        return await HotelsRepository(session).get_all(
+            location, 
+            title, 
+            limit=per_page,
+            offset=per_page * (pagination.page - 1)
+            )
+    
 
 @router.post('/')
 async def post_hotel(
@@ -43,11 +33,10 @@ async def post_hotel(
     hotel_data: HotelDep
 ):
     async with async_session_maker() as session:
-        add_hotel_stmt = insert(HotelsOrm).values(**hotel_data.model_dump())
-        await session.execute(add_hotel_stmt)
+        hotel = await HotelsRepository(session).add(hotel_data)
         await session.commit()
 
-    return {'status': 'OK'}
+    return {'status': 'OK', 'data': hotel}
 
 
 @router.put('/{id}')
