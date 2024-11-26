@@ -44,10 +44,9 @@ async def put_hotel(
     id: int,
     hotel_data: HotelDep
 ):
-    global hotels
-    hotel = next(filter(lambda hotel : hotel['id'] == id, hotels))
-    hotel['title'] = hotel_data.title
-    hotel['name'] = hotel_data.name
+    async with async_session_maker() as session:
+        await HotelsRepository(session).edit(hotel_data, id=id)
+        await session.commit()
     return {'status': 'OK'}
 
 
@@ -69,6 +68,7 @@ async def update_hotel(
 async def delete(
     id: int
 ):
-    global hotels
-    hotels = list(filter(lambda hotel : hotel['id'] != id, hotels))
+    async with async_session_maker() as session:
+        await HotelsRepository(session).delete(id=id)
+        await session.commit()
     return {'status': 'OK'}

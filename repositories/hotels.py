@@ -29,12 +29,3 @@ class HotelsRepository(BaseRepository):
         hotels = res.scalars().all()
 
         return hotels
-
-    async def add(
-              self, 
-              hotel_data: HotelDep
-        ):
-        add_hotel_stmt = insert(HotelsOrm).values(**hotel_data.model_dump())
-        res_insert = await self.session.execute(add_hotel_stmt)
-        res_select = await self.session.execute(select(HotelsOrm).filter(HotelsOrm.id == res_insert.inserted_primary_key[0]))
-        return res_select.scalars().all()
