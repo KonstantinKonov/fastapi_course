@@ -2,8 +2,8 @@ from fastapi import APIRouter, Body, Query
 
 from src.api.dependencies import PaginationDep, HotelDep, HotelPatchDep
 from src.database import async_session_maker
-from src.models.hotels import HotelsOrm
-from src.models.rooms import RoomsOrm
+#from src.models.hotels import HotelsOrm
+#from src.models.rooms import RoomsOrm
 from sqlalchemy import insert, select
 from repositories.hotels import HotelsRepository
 
@@ -27,6 +27,15 @@ async def get_hotels(
             )
     
 
+@router.get('/{id}')
+async def get_hotel(id: int):
+    async with async_session_maker() as session:
+        return await HotelsRepository(session).get_one_or_none(
+            id=id
+        )
+
+
+
 @router.post('/')
 async def post_hotel(
     hote_id: int,
@@ -40,27 +49,24 @@ async def post_hotel(
 
 
 @router.put('/{id}')
-async def put_hotel(
+async def edit_hotel(
     id: int,
     hotel_data: HotelDep
 ):
     async with async_session_maker() as session:
-        await HotelsRepository(session).edit(hotel_data, id=id)
+        await HotelsRepository(session).edit(hotel_data, exclude_unset=False, id=id)
         await session.commit()
     return {'status': 'OK'}
 
 
 @router.patch('/{id}')
-async def update_hotel(
+async def patch_hotel(
     id: int,
     hotel_data: HotelPatchDep
 ):
-    global hotels
-    hotel = next(filter(lambda hotel : hotel['id'] == id, hotels))
-    if hotel_data.title:
-        hotel['title'] = hotel_data.title
-    if hotel_data.name:
-        hotel['name'] = hotel_data.name
+    async with async_session_maker() as session:
+        await HotelsRepository(session).edit(hotel_data, exclude_unset=True, id=id)
+        await session.commit()
     return {'status': 'OK'}
 
 
