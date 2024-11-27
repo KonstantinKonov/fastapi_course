@@ -5,7 +5,7 @@ from src.database import async_session_maker
 #from src.models.hotels import HotelsOrm
 #from src.models.rooms import RoomsOrm
 from sqlalchemy import insert, select
-from repositories.hotels import HotelsRepository
+from src.repositories.hotels import HotelsRepository
 
 
 router = APIRouter(prefix='/hotels', tags=['Hotels'])
