@@ -1,7 +1,8 @@
 from typing import Annotated
-from fastapi import Depends, Query, Body
+from fastapi import Depends, Query, Body, HTTPException, Request
 from pydantic import BaseModel
 
+from src.services.auth import AuthService
 
 class PaginationParams(BaseModel):
     page: Annotated[int, Query(1, gt=0)]
@@ -21,3 +22,18 @@ class HotelPatch(BaseModel):
 PaginationDep = Annotated[PaginationParams, Depends()]
 HotelDep = Annotated[Hotel, Depends()]
 HotelPatchDep = Annotated[HotelPatch, Depends()]
+
+
+def get_token(request: Request) -> str:
+    token = request.cookies.get('access_token')
+    if not token:
+        raise HTTPException(status_code=401, detail='token required')
+    return token
+
+
+def get_current_user_id(token: str = Depends(get_token)) -> int:
+    data = AuthService().encode_token(token)
+    return data['user_id']
+
+
+UserIdDep = Annotated[int, Depends(get_current_user_id)]
