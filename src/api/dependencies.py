@@ -19,6 +19,24 @@ class HotelPatch(BaseModel):
     location: Annotated[str | None, Body()]
 
 
+class Room(BaseModel):
+    title: Annotated[str, Body()]
+    description: Annotated[str, Body()]
+    price: Annotated[int, Body()]
+    quantity: Annotated[int, Body()]
+
+
+class RoomPatch(BaseModel):
+    title: Annotated[str | None, Body()]
+    description: Annotated[str | None, Body()]
+    price: Annotated[int | None, Body()]
+    quantity: Annotated[int | None, Body()]
+
+
+RoomDep = Annotated[Room, Depends()]
+RoomPatchDep = Annotated[RoomPatch, Depends()]
+
+
 PaginationDep = Annotated[PaginationParams, Depends()]
 HotelDep = Annotated[Hotel, Depends()]
 HotelPatchDep = Annotated[HotelPatch, Depends()]
