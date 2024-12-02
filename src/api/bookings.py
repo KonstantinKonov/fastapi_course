@@ -1,27 +1,41 @@
 from fastapi import APIRouter, Body, Query, Request, HTTPException
 import datetime as dt
-from src.api.dependencies import DBDep
-from src.schemas.bookings import Bookings
-from src.services.auth import AuthService
+from src.api.dependencies import DBDep, UserIdDep
+from src.schemas.bookings import Booking, BookingAdd, BookingAddRequest
 
 
 router = APIRouter(prefix='/bookings', tags=['Bookings'])
 
+
 @router.post('')
-def add_booking(
-    request: Request,
-    date_from: dt.date,
-    date_to: dt.date,
-    room_id: int
+async def add_booking(
+    user_id: UserIdDep,
+    booking_data: BookingAddRequest,
+    db: DBDep
 ):
-    room = DBDep.rooms.get_one_or_none(room_id=room_id)
-    access_token = request.cookies.get('access_token')
-    data = AuthService().decode_token(access_token)
-    user_id = data.get('user_id')
-    if room is not None and user_id is not None:
-        price = room.price * (date_from - date_to).days()
-        booking_data = Bookings(room_id=room_id, user_id=user_id)
-        DBDep.bookings.add(room_id=room_id, user_id=user_id, date_from=date_from, date_to=date_to, price=price)
-        return {'status': 'OK'}
-    else:
-        raise HTTPException(status_code=401, detail='incorrect password')
+    room = await db.rooms.get_one_or_none(id=booking_data.room_id)
+    room_price = room.price
+    _booking_data = BookingAdd(
+        user_id=user_id,
+        price=...,
+        **booking_data.model_dump()
+    )
+    booking = await db.bookings.add(_booking_data)
+    await db.commit()
+
+    return {'status': 'OK', 'data': booking}
+
+
+@router.get('')
+async def get_bookings(
+    db: DBDep
+):
+    return await db.bookings.get_all()
+
+
+@router.get('/me')
+async def get_my_bookings(
+    user_id: UserIdDep,
+    db: DBDep
+):
+    return await db.bookings.get_one_or_none(user_id=user_id)
