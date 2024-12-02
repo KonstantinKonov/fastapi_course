@@ -9,12 +9,16 @@ class BaseRepository:
     def __init__(self, session):
         self.session = session
 
-    # get all
-    async def get_all(self):
-        query = select(HotelsOrm)
-        result = await self.session.execute(query)
+    # get filtered
+    async def get_filtered(self, **filter_by):
+        query = select(self.model).filter_by(**filter_by)
+        res = await self.session.execute(query)
+        return [self.schema.model_validate(model) for model in res.scalars().all()]
 
-        return result.scalars().all()
+
+    # get all
+    async def get_all(self, *args, **kwargs):
+        return await self.get_filtered()
 
 
     # get one by filter data

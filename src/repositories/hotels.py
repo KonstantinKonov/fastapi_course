@@ -2,6 +2,7 @@ from repositories.base import BaseRepository
 from src.models.hotels import HotelsOrm
 from sqlalchemy import select, insert
 from src.api.dependencies import HotelDep
+from pydantic import BaseModel, ConfigDict
 
 
 class HotelsRepository(BaseRepository):
@@ -29,3 +30,12 @@ class HotelsRepository(BaseRepository):
         hotels = res.scalars().all()
 
         return hotels
+
+
+class HodelAdd(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+
+class HotelPatch(BaseModel):
+    title: str | None = None
+    location: str | None = None
