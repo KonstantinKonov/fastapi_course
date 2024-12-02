@@ -40,8 +40,8 @@ RoomPatchDep = Annotated[RoomPatch, Depends()]
 
 
 PaginationDep = Annotated[PaginationParams, Depends()]
-HotelDep = Annotated[Hotel, Depends()]
-HotelPatchDep = Annotated[HotelPatch, Depends()]
+#HotelDep = Annotated[Hotel, Depends()]
+#HotelPatchDep = Annotated[HotelPatch, Depends()]
 
 
 def get_token(request: Request) -> str:

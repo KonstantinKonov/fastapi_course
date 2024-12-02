@@ -14,7 +14,7 @@ router = APIRouter(prefix='/rooms', tags=['Rooms'])
 @router.get('/{hotel_id}/rooms')
 async def get_rooms(
     hotel_id: int,
-    db: DBdep
+    db: DBDep
 ):
     return await db.rooms.get_fitered(hote_id=hotel_id)
 

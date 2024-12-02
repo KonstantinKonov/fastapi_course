@@ -5,7 +5,7 @@ from src.database import async_session_maker
 #from src.models.hotels import HotelsOrm
 #from src.models.rooms import RoomsOrm
 from sqlalchemy import insert, select
-from src.repositories.hotels import HotelsRepository, HotelAdd, HotelPatch
+from src.repositories.hotels import HotelAdd, HotelPatch
 from src.api.dependencies import DBDep
 from src.utils.db_manager import DBManager
 
