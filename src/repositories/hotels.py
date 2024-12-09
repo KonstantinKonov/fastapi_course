@@ -15,21 +15,30 @@ class HotelsRepository(BaseRepository):
 
     async def get_filtered_by_time(
             self,
-            hotel_location: str,
-            hotel_title: str,
             date_from: date,
             date_to: date,
+            location,
+            title,
             limit,
-            offset
-    ):
+            offset,
+    ) -> list[Hotel]:
         rooms_ids_to_get = rooms_ids_for_booking(date_from=date_from, date_to=date_to)
         hotels_ids_to_get = (
             select(RoomsOrm.hotel_id)
             .select_from(RoomsOrm)
             .filter(RoomsOrm.id.in_(rooms_ids_to_get))
-            .filter(HotelsOrm.location.ilike(hotel_location))
-            .filter(HotelsOrm.title.ilike(hotel_title))
+        )
+
+        query = select(HotelsOrm).filter(HotelsOrm.id.in_(hotels_ids_to_get))
+        if location:
+            query = query.filter(func.lower(HotelsOrm.location).contains(location.strip().lower()))
+        if title:
+            query = query.filter(func.lower(HotelsOrm.title).contains(title.strip().lower()))
+        query = (
+            query
             .limit(limit)
             .offset(offset)
         )
-        return await self.get_filtered(HotelsOrm.id.in_(hotels_ids_to_get))
+        result = await self.session.execute(query)
+
+        return [Hotel.model_validate(hotel, from_attributes=True) for hotel in result.scalars().all()]

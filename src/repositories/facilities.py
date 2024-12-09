@@ -1,10 +1,13 @@
-from sqlalchemy import select, func
-
+from src.models.facilities import FacilitiesOrm, RoomsFacilitiesOrm
 from src.repositories.base import BaseRepository
-from src.schemas.facilities import Facilities
-from src.models.facilities import FacilitiesOrm
+from src.schemas.facilities import Facility, RoomFacility
 
 
 class FacilitiesRepository(BaseRepository):
     model = FacilitiesOrm
-    schema = Facilities
+    schema = Facility
+
+
+class RoomsFacilitiesRepository(BaseRepository):
+    model = RoomsFacilitiesOrm
+    schema = RoomFacility
