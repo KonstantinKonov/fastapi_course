@@ -5,11 +5,13 @@ from fastapi import APIRouter, Body, Query
 from src.api.dependencies import DBDep
 from src.schemas.facilities import RoomFacilityAdd
 from src.schemas.rooms import RoomAdd, RoomAddRequest, RoomPatchRequest, RoomPatch
+from src.init import cache
 
 router = APIRouter(prefix="/hotels", tags=["Номера"])
 
 
 @router.get("/{hotel_id}/rooms")
+@cache(expire=10)
 async def get_rooms(
         hotel_id: int,
         db: DBDep,

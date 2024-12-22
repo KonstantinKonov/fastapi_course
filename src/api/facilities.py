@@ -3,6 +3,7 @@ from fastapi import APIRouter, Body
 
 from src.api.dependencies import DBDep
 from src.schemas.facilities import FacilityAdd
+from src.init import cache
 
 router = APIRouter(prefix="/facilities", tags=["Удобства"])
 
