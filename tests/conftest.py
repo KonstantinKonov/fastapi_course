@@ -1,4 +1,7 @@
 import json
+from unittest import mock
+
+mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()
 
 import pytest
 
@@ -68,3 +71,18 @@ async def register_user(ac, setup_database):
             "password": "1234"
         }
     )
+
+
+@pytest.fixture(scope="session", autouse=True)
+async def authenticated_ac(ac, register_user):
+    response = await ac.post(
+        "/login",
+        json={
+            "email": "kot@per.com",
+            "password": "1234"
+        }
+    )
+
+    assert response.cookies
+    assert 'access_token' in response.cookies
+    yield ac
