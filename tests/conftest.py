@@ -23,7 +23,23 @@ async def setup_database(check_test_mode):
         await conn.run_sync(Base.metadata.create_all)
 
 
-   
+@pytest.fixture(scope="session", autouse=True)
+async def fillin_data(setup_database):
+    with open('mock_hotels.json') as fp:
+        hotels = json.load(fp)
+    
+    with open('mock_rooms.json') as fp:
+        rooms = json.load(fp)
+
+    async with DBManager(session_factory=async_session_maker_null_pool) as db:
+        for hotel in hotels:
+            hotel = HotelAdd(**hotel)
+            new_hotel_data = await db.hotels.add(hotel)
+        for room in rooms:
+            room = RoomAdd(**room)
+            new_room_data = await db.rooms.add(room)
+        await db.commit()
+    
 
 @pytest.fixture(scope="session", autouse=True)
 async def register_user(setup_database):
