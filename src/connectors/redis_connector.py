@@ -33,4 +33,3 @@ class RedisManager:
 # value = await redis_manager.get("key")
 # await redis_manager.delete("key")
 # await redis_manager.close()
-
