@@ -19,7 +19,7 @@ from src.utils.db_manager import DBManager
 
 @pytest.fixture(scope="session", autouse=True)
 def check_test_mode():
-    assert settings.MODE == "TEST"
+    assert settings.MODE == "LOCAL"
 
 
 async def get_db_null_pool():
