@@ -1,4 +1,6 @@
+# ruff: noqa: E402
 import json
+from typing import AsyncGenerator
 from unittest import mock
 
 mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()
@@ -9,7 +11,7 @@ from src.api.dependencies import get_db
 from src.config import settings
 from src.database import Base, engine_null_pool, async_session_maker_null_pool
 from src.main import app
-from src.models import *
+from src.models import *  # noqa
 from httpx import AsyncClient
 
 from src.schemas.hotels import HotelAdd
@@ -19,7 +21,7 @@ from src.utils.db_manager import DBManager
 
 @pytest.fixture(scope="session", autouse=True)
 def check_test_mode():
-    assert settings.MODE == "LOCAL"
+    assert settings.MODE == "TEST"
 
 
 async def get_db_null_pool():
@@ -28,7 +30,7 @@ async def get_db_null_pool():
 
 
 @pytest.fixture(scope="function")
-async def db() -> DBManager:
+async def db() -> AsyncGenerator[DBManager, None]:
     async for db in get_db_null_pool():
         yield db
 
@@ -57,18 +59,18 @@ async def setup_database(check_test_mode):
 
 
 @pytest.fixture(scope="session")
-async def ac() -> AsyncClient:
+async def ac() -> AsyncGenerator[AsyncClient, None]:
     async with AsyncClient(app=app, base_url="http://test") as ac:
         yield ac
 
 
 @pytest.fixture(scope="session", autouse=True)
-async def register_user(ac, setup_database):
+async def register_user(ac: AsyncClient, setup_database):
     await ac.post("/auth/register", json={"email": "kot@pes.com", "password": "1234"})
 
 
 @pytest.fixture(scope="session")
-async def authenticated_ac(register_user, ac):
+async def authenticated_ac(register_user, ac: AsyncClient):
     await ac.post("/auth/login", json={"email": "kot@pes.com", "password": "1234"})
     assert ac.cookies["access_token"]
     yield ac
