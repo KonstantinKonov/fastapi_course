@@ -1,15 +1,14 @@
 from datetime import date
 
 from sqlalchemy import select
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import selectinload
-from sqlalchemy import NoResultFound
 
-from src.database import Base
+from src.exceptions import RoomNotFoundException
 from src.repositories.base import BaseRepository
 from src.models.rooms import RoomsOrm
 from src.repositories.mappers.mappers import RoomDataMapper, RoomDataWithRelsMapper
 from src.repositories.utils import rooms_ids_for_booking
-from src.exceptions import RoomNotFoundException
 
 
 class RoomsRepository(BaseRepository):
@@ -41,9 +40,7 @@ class RoomsRepository(BaseRepository):
         )
         result = await self.session.execute(query)
         try:
-            model = result.scalars().one_or_none()
+            model = result.scalar_one()
         except NoResultFound:
             raise RoomNotFoundException
-        if model is None:
-            return None
         return RoomDataWithRelsMapper.map_to_domain_entity(model)

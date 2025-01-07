@@ -2,8 +2,8 @@ import shutil
 
 from fastapi import APIRouter, UploadFile, BackgroundTasks
 
-from src.tasks.tasks import resize_image
 from src.services.images import ImagesService
+from src.tasks.tasks import resize_image
 
 router = APIRouter(prefix="/images", tags=["Изображения отелей"])
 

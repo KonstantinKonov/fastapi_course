@@ -11,7 +11,7 @@ import uvicorn
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 from src.init import redis_manager
 from src.api.hotels import router as router_hotels
@@ -55,4 +55,4 @@ async def custom_swagger_ui_html():
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", reload=True)

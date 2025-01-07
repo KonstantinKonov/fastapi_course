@@ -3,8 +3,9 @@ from datetime import date
 from fastapi import APIRouter, Body, Query
 
 from src.api.dependencies import DBDep
-from src.exceptions import check_date_to_after_date_from, ObjectNotFoundException, HotelNotFoundHTTPException, RoomNotFoundHTTPException, RoomNotFoundException, HotelNotFoundException
-from src.schemas.rooms import RoomAddRequest, RoomPatchRequest 
+from src.exceptions import HotelNotFoundHTTPException, \
+    RoomNotFoundHTTPException, RoomNotFoundException, HotelNotFoundException
+from src.schemas.rooms import RoomAddRequest, RoomPatchRequest
 from src.services.rooms import RoomService
 
 router = APIRouter(prefix="/hotels", tags=["Номера"])
@@ -23,7 +24,7 @@ async def get_rooms(
 @router.get("/{hotel_id}/rooms/{room_id}")
 async def get_room(hotel_id: int, room_id: int, db: DBDep):
     try:
-        return await db.rooms.get_one_or_none_with_rels(id=room_id, hotel_id=hotel_id)
+        return await RoomService(db).get_room(room_id, hotel_id=hotel_id)
     except RoomNotFoundException:
         raise RoomNotFoundHTTPException
 
@@ -34,6 +35,7 @@ async def create_room(hotel_id: int, db: DBDep, room_data: RoomAddRequest = Body
         room = await RoomService(db).create_room(hotel_id, room_data)
     except HotelNotFoundException:
         raise HotelNotFoundHTTPException
+    return {"status": "OK", "data": room}
 
 
 @router.put("/{hotel_id}/rooms/{room_id}")
@@ -44,6 +46,7 @@ async def edit_room(
     db: DBDep,
 ):
     await RoomService(db).edit_room(hotel_id, room_id, room_data)
+    return {"status": "OK"}
 
 
 @router.patch("/{hotel_id}/rooms/{room_id}")
@@ -54,8 +57,10 @@ async def partially_edit_room(
     db: DBDep,
 ):
     await RoomService(db).partially_edit_room(hotel_id, room_id, room_data)
-    
+    return {"status": "OK"}
+
 
 @router.delete("/{hotel_id}/rooms/{room_id}")
 async def delete_room(hotel_id: int, room_id: int, db: DBDep):
     await RoomService(db).delete_room(hotel_id, room_id)
+    return {"status": "OK"}
