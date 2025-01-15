@@ -3,7 +3,7 @@ import logging
 import sys
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
@@ -20,6 +20,7 @@ from src.api.auth import router as router_auth
 from src.api.bookings import router as router_bookings
 from src.api.facilities import router as router_facilities
 from src.api.images import router as router_images
+from src.config import settings
 
 
 @asynccontextmanager
@@ -54,5 +55,9 @@ async def custom_swagger_ui_html():
     )
 
 
+@app.get("/healthcheck", include_in_schema=False)
+async def healthcheck():
+    return {"healthcheck": "OK"}
+
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", reload=True)
+    uvicorn.run("main:app", host=settings.APP_HOST, port=settings.APP_PORT, reload=True)
