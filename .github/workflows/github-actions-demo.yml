@@ -14,7 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Build the Docker image
-        run: docker build -t app:latest .
+        run: docker build -t konstantinkonov/app:latest .
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
