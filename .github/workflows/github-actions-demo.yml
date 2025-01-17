@@ -21,7 +21,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Push the Docker Image
-        run: docker push app:latest
+        run: docker push konstantinkonov/app:latest
   
   lint-format:
     name: Lint and Format
@@ -35,4 +35,4 @@ jobs:
       - name: Run Ruff check
         run: |
           docker network create myNetwork  
-          docker run --rm --network myNetwork app ruff check
+          docker run --rm --network myNetwork konstantinkonov/app ruff check
