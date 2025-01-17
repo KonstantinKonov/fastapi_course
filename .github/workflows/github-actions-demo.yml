@@ -31,8 +31,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Pull the Docker image
-        run: docker pull app:latest
+        run: docker pull konstantinkonov/app:latest
       - name: Run Ruff check
         run: |
           docker network create myNetwork  
-          docker run --rm --network myNetwork konstantinkonov/app ruff check
+          docker run --rm --network myNetwork konstantinkonov/app:latest ruff check
