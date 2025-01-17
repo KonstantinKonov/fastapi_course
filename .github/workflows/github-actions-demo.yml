@@ -14,7 +14,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Build the Docker image
-        run: docker build -t app .
+        run: docker build -t app:latest .
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Push the Docker Image
+        run: docker push app:latest
   
   lint-format:
     name: Lint and Format
@@ -23,6 +30,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: Pull the Docker image
+        run: docker pull app:latest
       - name: Run Ruff check
         run: |
           docker network create myNetwork  
