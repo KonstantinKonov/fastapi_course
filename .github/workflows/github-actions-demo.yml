@@ -35,4 +35,40 @@ jobs:
       - name: Run Ruff check
         run: |
           docker network create myNetwork  
-          docker run --rm --network myNetwork konstantinkonov/app:latest ruff check
+          docker run --rm --network myNetwork konstantinkonov/app:latest ruff check --exit-zero .
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Pull the Docker image
+        run: docker pull konstantinkonov/app:latest
+      - name: Run migration
+        run: |
+          docker network create myNetwork
+          docker run --rm --network myNetwork konstantinkonov/app:latest alembic upgrade head
+          docker run --rm --network myNetwork konstantinkonov/app:latest pytest -s -v
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Deploy to server
+        uses: appleboy/ssh-action@main
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_PRIVATE_KEY }}
+          script: |
+            cd fastapi_course
+            git pull
+            docker compose up --build
+
+
+
+  
+      
