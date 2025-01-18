@@ -46,10 +46,24 @@ jobs:
         uses: actions/checkout@v3
       - name: Pull the Docker image
         run: docker pull konstantinkonov/app:latest
+      - name: Create .env file
+        run: |
+          echo "MODE=${{ secrets.MODE }}" > .env
+          echo "APP_HOST=${{ secrets.APP_HOST }}" > .env
+          echo "APP_PORT=${{ secrets.APP_PORT }}" > .env
+          echo "DB_HOST=${{ secrets.DB_HOST }}" > .env
+          echo "DB_PORT=${{ secrets.DB_PORT }}" > .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" > .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" > .env
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" > .env
+          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" > .env
+          echo "JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }}" > .env
+          echo "ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}" > .env
       - name: Run migration
         run: |
           docker network create myNetwork
-          docker run --rm --network myNetwork konstantinkonov/app:latest alembic upgrade head
+          docker run --rm --network myNetwork --env-file .env-test postgres:14
+          docker run --rm --network myNetwork --env_file .env-test myNetwork konstantinkonov/app:latest alembic upgrade head
           docker run --rm --network myNetwork konstantinkonov/app:latest pytest -s -v
 
   deploy:
