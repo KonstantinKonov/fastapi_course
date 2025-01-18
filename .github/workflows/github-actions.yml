@@ -61,10 +61,10 @@ jobs:
           #echo "ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}" > .env
       - name: Run migration
         run: |
-          docker network create myNetwork
-          docker run --rm --network myNetwork --env-file .env-test -d postgres:14
-          docker run --rm --network myNetwork --env-file .env-test -d myNetwork konstantinkonov/app:latest alembic upgrade head
-          docker run --rm --network myNetwork -d konstantinkonov/app:latest pytest -s -v
+          docker network create mynetwork
+          docker run --rm --network mynetwork --env-file .env-test -d postgres:14
+          docker run --rm --network mynetwork --env-file .env-test -d konstantinkonov/app:latest alembic upgrade head
+          docker run --rm --network mynetwork -d konstantinkonov/app:latest pytest -s -v
 
   deploy:
     runs-on: ubuntu-latest
