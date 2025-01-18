@@ -54,6 +54,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    needs: test
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -67,8 +68,3 @@ jobs:
             cd fastapi_course
             git pull
             docker compose up --build -d
-
-
-
-  
-      

@@ -9,6 +9,6 @@ RUN pip install -r requirements.txt
 COPY . .
 
 #CMD ["python", "src/main.py"]
-ENTRYPOINT [ "./initial_migration.sh" ]
+#ENTRYPOINT [ "./initial_migration.sh" ]
 
-CMD python src/main.py
+CMD alembic upgrade head; python src/main.py
