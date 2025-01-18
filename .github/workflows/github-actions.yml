@@ -62,9 +62,9 @@ jobs:
       - name: Run migration
         run: |
           docker network create myNetwork
-          docker run --rm --network myNetwork --env-file .env-test postgres:14
-          docker run --rm --network myNetwork --env_file .env-test myNetwork konstantinkonov/app:latest alembic upgrade head
-          docker run --rm --network myNetwork konstantinkonov/app:latest pytest -s -v
+          docker run --rm --network myNetwork --env-file .env-test -d postgres:14
+          docker run --rm --network myNetwork --env_file .env-test -d myNetwork konstantinkonov/app:latest alembic upgrade head
+          docker run --rm --network myNetwork -d konstantinkonov/app:latest pytest -s -v
 
   deploy:
     runs-on: ubuntu-latest
